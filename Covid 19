@@ -1,0 +1,43 @@
+covid19_india/
+│
+├── main.py                # Main script to run the project
+├── requirements.txt       # Python libraries to be installed
+├── data/
+│   └── india_covid_data.csv  # Storing the COVID-19 data (if needed)
+└── visuals/
+    └── plots.png           # Graphs and visual outputs
+pip install requests pandas matplotlib seaborn
+import requests
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# API URL for fetching data
+url = "https://api.covid19api.com/dayone/country/india"
+
+# Fetching the data
+response = requests.get(url)
+data = response.json()
+
+# Convert JSON data to a pandas DataFrame
+df = pd.DataFrame(data)
+
+# Parsing the relevant data
+df['Date'] = pd.to_datetime(df['Date'])
+df = df[['Date', 'Confirmed', 'Deaths', 'Recovered', 'Active']]
+
+# Save the data to a CSV file for future reference
+df.to_csv('data/india_covid_data.csv', index=False)
+# Plot the total confirmed cases over time
+plt.figure(figsize=(10, 6))
+sns.lineplot(x='Date', y='Confirmed', data=df, label='Confirmed Cases')
+sns.lineplot(x='Date', y='Deaths', data=df, label='Deaths')
+sns.lineplot(x='Date', y='Recovered', data=df, label='Recovered')
+plt.title('COVID-19 Cases in India')
+plt.xlabel('Date')
+plt.ylabel('Number of Cases')
+plt.legend()
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig('visuals/covid19_india_cases.png')
+plt.show()
